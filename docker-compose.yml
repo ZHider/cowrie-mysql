@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+  cowrie:
+    image: cowrie/cowrie:c070446e
+    container_name: honeypot_ssh
+
+    ports:
+      - 2222:2222
+
+    volumes:
+      - ./cowrie/var:/cowrie/cowrie-git/var
+      - ./cowrie/etc:/cowrie/cowrie-git/etc
+    
+    links:
+      - mysql
+    depends_on:
+      - mysql
+
+
+  mysql:
+    image: mysql:8.0.32
+    container_name: honeypot_mysql
+
+    expose:
+      - 3306
+    ports:
+      - 127.0.0.1:3306:3306
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/mysql.sql:/docker-entrypoint-initdb.d/mysql.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: "********"
+      MYSQL_DATABASE: cowrie
+      MYSQL_USER: cowrie
+      MYSQL_PASSWORD: secret
